@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const bodyParser = require('body-parser')
 
 const MongoClient = require('mongodb').MongoClient
 const connectionString = 'mongodb+srv://scode:admin@cluster0-6bmqd.mongodb.net/test?retryWrites=true&w=majority'
@@ -7,6 +8,10 @@ const client = new MongoClient(connectionString, {
   useUnifiedTopology: true,
   useNewUrlParser: true
 })
+
+router.use(bodyParser.urlencoded({ extended: true }))
+router.use(bodyParser.json())
+router.use(bodyParser.raw())
 
 client.connect(err => {
   if (err) {
@@ -24,6 +29,13 @@ client.connect(err => {
         }
         // Return data as JSON
         res.json(posts)
+      })
+    })
+
+    router.post('/api/add/post', (req, res) => {
+      db.collection('posts').insertOne(req.body, (err, data) => {
+          if(err) return console.log(err);
+          res.send((req.body));
       })
     })
   }
