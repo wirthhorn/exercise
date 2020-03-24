@@ -5,7 +5,6 @@ export const Form = ({ parentId, onFormSubmit }) => {
     <div>
       <form onSubmit={onFormSubmit}>
         <input type="hidden" name="parentId" value={parentId} />
-        <input type="hidden" name="parentId" value={parentId} />
         <div class="form-group">
           <label for="title">Title</label>
           <input type="text" class="form-control" id="title" name="title" aria-describedby="emailHelp" placeholder="Title" />

@@ -4,7 +4,6 @@ h1 {
 
 body {
 	max-width: 1200px;
-	margin: 1rem auto !important;
 }
 
 .post {
@@ -13,4 +12,25 @@ body {
 	-moz-box-shadow: -1px 0px 3px 0px rgba(0,0,0,0.75);
 	box-shadow: -1px 0px 3px 0px rgba(0,0,0,0.75);
 	padding: 1rem;
+}
+
+.snake-board {
+	position: relative;
+	width: 760px;
+	height: 760px;
+	border: 1px solid lightgray;
+}
+
+.snake {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background-color: lightblue;
+}
+
+.food {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background-color: darkred;
 }
