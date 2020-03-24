@@ -2,10 +2,6 @@ h1 {
   color: green;
 }
 
-body {
-	max-width: 1200px;
-}
-
 .post {
 	border-radius: 5px;
 	-webkit-box-shadow: -1px 0px 3px 0px rgba(0,0,0,0.75);
@@ -16,6 +12,7 @@ body {
 
 .snake-board {
 	position: relative;
+	margin: 1rem auto;
 	width: 760px;
 	height: 760px;
 	border: 1px solid lightgray;
@@ -31,6 +28,7 @@ body {
 
 .food {
 	position: absolute;
+	border: 1px solid white;
 	width: 20px;
 	height: 20px;
 	background-color: darkred;

@@ -8,8 +8,9 @@ export const SnakeBoard = () => {
     const [positionX, setPositionX] = useState(0)
     const [foodPositionY, setFoodPositionY] = useState(60)
     const [foodPositionX, setFoodPositionX] = useState(0)
-    const [speed, setSpeed] = useState(500)
+    const [speed, setSpeed] = useState(400)
     const [play, setPlay] = useState(false)
+    const [score, setScore] = useState(-1)
 
     const [snakeParts, setSnakeParts] = useState([
         { x: 0, y: 0 },
@@ -61,6 +62,7 @@ export const SnakeBoard = () => {
         }
         if (positionX === foodPositionX && positionY === foodPositionY) {
             renderFood()
+            setScore(score + 1)
             setSnakeParts([{
                 x: snakeParts[0].x, y: snakeParts[0].y
             },...snakeParts])
@@ -83,34 +85,40 @@ export const SnakeBoard = () => {
             const interval = setInterval(() => {
                 if (direction === 'down') {
                     setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
-                        x: snakeParts[snakeParts.length -1].x, y: snakeParts[snakeParts.length -1].y + 20
+                        x: snakeParts[snakeParts.length -1].x, y: checkForTheWall(snakeParts[snakeParts.length -1].y, 740, 0, "plus")
                     }])
                     setPositionY(snakeParts[snakeParts.length -1].y + 20)
                 }
                 if (direction === 'up') {
                     setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
-                        x: snakeParts[snakeParts.length -1].x, y: snakeParts[snakeParts.length -1].y - 20
+                        x: snakeParts[snakeParts.length -1].x, y: checkForTheWall(snakeParts[snakeParts.length -1].y, 0, 740, "minus")
                     }])
                     setPositionY(snakeParts[snakeParts.length -1].y - 20)
                 }
                 if (direction === 'left') {
                     setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
-                        x: snakeParts[snakeParts.length -1].x - 20, y: snakeParts[snakeParts.length -1].y
+                        x: checkForTheWall(snakeParts[snakeParts.length -1].x, 0, 740, "minus"), y: snakeParts[snakeParts.length -1].y
                     }])
                     setPositionX(snakeParts[snakeParts.length -1].x - 20)
                 }
                 if (direction === 'right') {
                     setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
-                        x: snakeParts[snakeParts.length -1].x + 20, y: snakeParts[snakeParts.length -1].y
+                        x: checkForTheWall(snakeParts[snakeParts.length -1].x, 740, 0, "plus"), y: snakeParts[snakeParts.length -1].y
                     }])
                     setPositionX(snakeParts[snakeParts.length -1].x + 20)
                 }
             }, speed);
             return () => clearInterval(interval);
-        }
-        
+        } 
     });
-    
+
+    function checkForTheWall (part, startPos, endPos, operation) {
+        if (part == startPos) {
+            return endPos
+        }
+        return operation === 'minus' ? part - 20 : part + 20
+    }
+
     function handleKeyPress (e) {
         switch (e.key) {
             case 'ArrowUp':
@@ -129,11 +137,14 @@ export const SnakeBoard = () => {
     }
 
     return (
-    <div onFocus={() => setPlay(true)} onBlur={() => setPlay(false)} tabIndex='0' onKeyDown={(e) => handleKeyPress(e)} className='snake-board'>
-        {
-            snakeParts.map(s => <div style={{ top: s.y, left: s.x }} className='snake'></div>)
-        }
-        <div ref={food} className='food'></div>
+    <div>
+        {score}
+        <div onFocus={() => setPlay(true)} onBlur={() => setPlay(false)} tabIndex='0' onKeyDown={(e) => handleKeyPress(e)} className='snake-board'>
+            {
+                snakeParts.map(s => <div style={{ top: s.y, left: s.x }} className='snake'></div>)
+            }
+            <div ref={food} className='food'></div>
+        </div>
     </div>
     )
 }
