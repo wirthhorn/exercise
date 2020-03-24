@@ -1,24 +1,38 @@
 import React, { useRef, useState, useEffect } from 'react'
 
 export const SnakeBoard = () => {
-    const food = useRef(null) 
-    const boardRef = useRef(null) 
-    const [direction, setDirection] = useState('down')
-    const [positionY, setPositionY] = useState(60)
-    const [positionX, setPositionX] = useState(0)
-    const [foodPositionY, setFoodPositionY] = useState(60)
-    const [foodPositionX, setFoodPositionX] = useState(0)
-    const [speed, setSpeed] = useState(400)
-    const [play, setPlay] = useState(false)
-    const [score, setScore] = useState(-1)
-
-    const [snakeParts, setSnakeParts] = useState([
+    const snakeInitialState = [
         { x: 0, y: 0 },
         { x: 0, y: 20 },
         { x: 0, y: 40 },
         { x: 0, y: 60 },
         { x: 0, y: 80 }
-    ])
+    ]
+
+    const failedMessages = [
+        "You find yourself tasty?",
+        "Sorry, you just ate yourself",
+        "if you're hungry, you know..?",
+        "I would try again!",
+        "Not bad, not bad, but..",
+        "You can do better!",
+        "Nicht schleeeecht"
+    ]
+
+    const food = useRef(null) 
+    const boardRef = useRef(null) 
+    const [direction, setDirection] = useState('down')
+    const [positionY, setPositionY] = useState(null)
+    const [positionX, setPositionX] = useState(null)
+    const [foodPositionY, setFoodPositionY] = useState(null)
+    const [foodPositionX, setFoodPositionX] = useState(null)
+    const [speed, setSpeed] = useState(400)
+    const [play, setPlay] = useState(false)
+    const [failed, setFailed] = useState(false)
+    const [start, setStart] = useState(true)
+    const [score, setScore] = useState(-1)
+
+    const [snakeParts, setSnakeParts] = useState(snakeInitialState)
 
     function getRandom20() {
         return getRandomInt(1, 37) * 20;
@@ -45,11 +59,11 @@ export const SnakeBoard = () => {
             return speed - 5
         }
 
-        if (speed > 40) {
+        if (speed > 50) {
             return speed - 2
         }
 
-        return 40
+        return 50
     }
 
     useEffect(() => {
@@ -57,8 +71,7 @@ export const SnakeBoard = () => {
         const snakeCollide = currentSnakeState.slice(0,-1).find(snake => snake.y === positionY && snake.x === positionX)
         if (snakeCollide) {
             setPlay(false)
-            // show failed screen
-            // restart snake
+            setFailed(true)
         }
         if (positionX === foodPositionX && positionY === foodPositionY) {
             renderFood()
@@ -136,10 +149,55 @@ export const SnakeBoard = () => {
         }
     }
 
+    function handlePlayAgain () {
+        setScore(0)
+        setSpeed(400)
+        setSnakeParts(snakeInitialState)
+        setFailed(false)
+        setDirection('down')
+        boardRef.current.focus()
+        setPlay(true)
+    }
+
+    function handlePlay () {
+        setStart(false)
+        boardRef.current.focus()
+    }
+
+    function renderOverlayScreen () {
+        if (failed || start) {
+            return (
+                <div onClick={(e) => e.stopPropagation()} className='failed-screen'>
+                    <div className='failed-screen-controls'>
+                        {failed &&
+                            <div>
+                                <p>{failedMessages[Math.floor(Math.random() * failedMessages.length - 1)]}</p>
+                                <p>Your Score: {score}</p>
+                                <button className='button' onClick={() => handlePlayAgain()}>
+                                    I want to try again
+                                </button>
+                            </div>
+                        }
+                        {start &&
+                            <div>
+                                <p>Do you want to try your luck with our snake game?</p>
+                                <button className='button' onClick={() => handlePlay()}>
+                                    Let's go!
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            )
+        }
+        return null
+    }
+
     return (
     <div>
-        {score}
-        <div onFocus={() => setPlay(true)} onBlur={() => setPlay(false)} tabIndex='0' onKeyDown={(e) => handleKeyPress(e)} className='snake-board'>
+        <div ref={boardRef} onFocus={() => {!failed && setPlay(true)}} onBlur={() => setPlay(false)} tabIndex='0' onKeyDown={(e) => handleKeyPress(e)} className='snake-board'>
+            {!failed && <div className='score'>Score: {score}</div>}
+            {renderOverlayScreen()}
             {
                 snakeParts.map(s => <div style={{ top: s.y, left: s.x }} className='snake'></div>)
             }
