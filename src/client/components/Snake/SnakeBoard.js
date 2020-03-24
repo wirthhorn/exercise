@@ -1,20 +1,22 @@
 import React, { useRef, useState, useEffect } from 'react'
 
 export const SnakeBoard = () => {
-    const snake = useRef(null)
-    const food = useRef(null)
+    const food = useRef(null) 
+    const boardRef = useRef(null) 
     const [direction, setDirection] = useState('down')
-    const [positionX, setPositionX] = useState(0)
     const [positionY, setPositionY] = useState(60)
-    const [foodPositionY, setFoodPositionY] = useState(0)
+    const [positionX, setPositionX] = useState(0)
+    const [foodPositionY, setFoodPositionY] = useState(60)
     const [foodPositionX, setFoodPositionX] = useState(0)
-    const [speed, setSpeed] = useState(1000)
+    const [speed, setSpeed] = useState(500)
+    const [play, setPlay] = useState(false)
 
     const [snakeParts, setSnakeParts] = useState([
         { x: 0, y: 0 },
         { x: 0, y: 20 },
         { x: 0, y: 40 },
-        { x: 0, y: 60 }
+        { x: 0, y: 60 },
+        { x: 0, y: 80 }
     ])
 
     function getRandom20() {
@@ -25,13 +27,47 @@ export const SnakeBoard = () => {
     return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    // useEffect(() => {
-    //     if (positionX === foodPositionX && positionY === foodPositionY) {
-    //         // renderFood()
-    //         setSpeed(speed > 100 ? speed - 1 : 100)
-    //         console.log(speed)
-    //     }
-    // }, [positionX, positionY])
+    function calculateSpeed () {
+        if (speed > 400) {
+            return speed - 30
+        }
+
+        if (speed > 300) {
+            return speed - 20
+        }
+
+        if (speed > 200) {
+            return speed - 10
+        }
+
+        if (speed > 100) {
+            return speed - 5
+        }
+
+        if (speed > 40) {
+            return speed - 2
+        }
+
+        return 40
+    }
+
+    useEffect(() => {
+        const currentSnakeState = snakeParts
+        const snakeCollide = currentSnakeState.slice(0,-1).find(snake => snake.y === positionY && snake.x === positionX)
+        if (snakeCollide) {
+            setPlay(false)
+            // show failed screen
+            // restart snake
+        }
+        if (positionX === foodPositionX && positionY === foodPositionY) {
+            renderFood()
+            setSnakeParts([{
+                x: snakeParts[0].x, y: snakeParts[0].y
+            },...snakeParts])
+            setSpeed(calculateSpeed())
+            console.log(speed)
+        }
+    }, [positionX, positionY])
 
     function renderFood () {
         const foodPositionX = getRandom20()
@@ -43,39 +79,37 @@ export const SnakeBoard = () => {
     }
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            // if (direction === 'down') {
-            //     snake.current.style.transform = `translate(${convertPixelInInteger(snake.current.style.fromLeft)}px,${convertPixelInInteger(snake.current.style.fromTop) + 20}px)`
-            //     snake.current.style.transition = 'transform .12s'
-            //     snake.current.style.fromTop = `${convertPixelInInteger(snake.current.style.fromTop) + 20}px`
-            //     setPositionY(convertPixelInInteger(snake.current.style.fromTop))
-            // } else if (direction === 'up') {
-            //     snake.current.style.transform = `translate(${convertPixelInInteger(snake.current.style.fromLeft)}px,${convertPixelInInteger(snake.current.style.fromTop) - 20}px)`
-            //     snake.current.style.transition = 'transform .12s'
-            //     snake.current.style.fromTop = `${convertPixelInInteger(snake.current.style.fromTop) - 20}px`
-            //     setPositionY(convertPixelInInteger(snake.current.style.fromTop))
-            // } else if (direction === 'left') {
-            //     snake.current.style.transform = `translate(${convertPixelInInteger(snake.current.style.fromLeft) - 20}px,${convertPixelInInteger(snake.current.style.fromTop)}px)`
-            //     snake.current.style.transition = 'transform .12s'
-            //     snake.current.style.fromLeft = `${convertPixelInInteger(snake.current.style.fromLeft) - 20}px`
-            //     setPositionX(convertPixelInInteger(snake.current.style.fromLeft))
-            // } else if (direction === 'right') {
-            //     snake.current.style.transform = `translate(${convertPixelInInteger(snake.current.style.fromLeft) + 20}px,${convertPixelInInteger(snake.current.style.fromTop)}px)`
-            //     snake.current.style.transition = 'transform .12s'
-            //     snake.current.style.fromLeft = `${convertPixelInInteger(snake.current.style.fromLeft) + 20}px`
-            //     setPositionX(convertPixelInInteger(snake.current.style.fromLeft))
-            // }
-            if (direction === 'down') {
-                setPositionY(positionY + 20)
-                setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
-                    x: positionX, y: 80
-                }])
-                // setSnakeParts()
-            }
-        }, speed);
+        if (play) {
+            const interval = setInterval(() => {
+                if (direction === 'down') {
+                    setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
+                        x: snakeParts[snakeParts.length -1].x, y: snakeParts[snakeParts.length -1].y + 20
+                    }])
+                    setPositionY(snakeParts[snakeParts.length -1].y + 20)
+                }
+                if (direction === 'up') {
+                    setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
+                        x: snakeParts[snakeParts.length -1].x, y: snakeParts[snakeParts.length -1].y - 20
+                    }])
+                    setPositionY(snakeParts[snakeParts.length -1].y - 20)
+                }
+                if (direction === 'left') {
+                    setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
+                        x: snakeParts[snakeParts.length -1].x - 20, y: snakeParts[snakeParts.length -1].y
+                    }])
+                    setPositionX(snakeParts[snakeParts.length -1].x - 20)
+                }
+                if (direction === 'right') {
+                    setSnakeParts([...snakeParts.filter((key, index) => index !== 0), {
+                        x: snakeParts[snakeParts.length -1].x + 20, y: snakeParts[snakeParts.length -1].y
+                    }])
+                    setPositionX(snakeParts[snakeParts.length -1].x + 20)
+                }
+            }, speed);
+            return () => clearInterval(interval);
+        }
         
-        return () => clearInterval(interval);
-    }, [direction, speed]);
+    });
     
     function handleKeyPress (e) {
         switch (e.key) {
@@ -94,20 +128,12 @@ export const SnakeBoard = () => {
         }
     }
 
-    function convertPixelInInteger (pixel) {
-        if (!pixel || pixel === '') {
-            return 0
-        }
-        return parseInt(pixel, 10)
-    }
-
     return (
-    <div tabIndex='0' onKeyDown={(e) => handleKeyPress(e)} className='snake-board'>
-        {/* <div ref={snake} className='snake'></div> */}
+    <div onFocus={() => setPlay(true)} onBlur={() => setPlay(false)} tabIndex='0' onKeyDown={(e) => handleKeyPress(e)} className='snake-board'>
         {
             snakeParts.map(s => <div style={{ top: s.y, left: s.x }} className='snake'></div>)
         }
-        {/* <div ref={food} className='food'></div> */}
+        <div ref={food} className='food'></div>
     </div>
     )
 }
