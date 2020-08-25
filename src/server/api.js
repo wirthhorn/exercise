@@ -18,7 +18,7 @@ client.connect(err => {
     // Get posts from MongoDB
     router.get('/api/posts', (req, res) => {
       // Query data from MongoDB
-      db.collection('postsAmer').find({}).toArray((err, posts) => {
+      db.collection('postsIrhad').find({}).toArray((err, posts) => {
         if (err) {
           console.error(err)
         }
