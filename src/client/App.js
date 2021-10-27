@@ -1,18 +1,19 @@
-import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+
 import './app.css'
-import { loadPosts } from './modules/posts'
 
 export const App = () => {
-  const dispatch = useDispatch()
-  const posts = useSelector(state => state.posts)
+  const [posts, setPosts] = useState([])
 
-  useEffect(() => {
-    dispatch(loadPosts())
+  useEffect(async () => {
+    const response = await axios.get('/api/posts')
+    setPosts(response.data)
   }, [])
 
   return (
     <div>
+      <h1>Posts</h1>
       <pre>{JSON.stringify(posts, null, 2)}</pre>
     </div>
   )
